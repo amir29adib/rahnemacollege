@@ -1,4 +1,6 @@
 import express from 'express';
+import { getUser } from './user';
+
 
 const app = express();
 
@@ -11,8 +13,14 @@ app.get('/', (req, res) => {
 });
 
 app.get('/user/login', (req, res) => {
-    const username = req.query.username;
-    const password = req.query.password;
+    const username = req.query.username?.toString();
+    const password = req.query.password?.toString();
     
-    res.send(JSON.stringify({message: 'Everything is OK'}));
+    if (!username || !password) {
+        return res.status(400).send(JSON.stringify({ message: 'Username and password are required' }));
+    }
+
+    const user = getUser(username, password);
+
+    res.send(JSON.stringify(user));
 });
