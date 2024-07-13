@@ -1,72 +1,97 @@
-import { UniqueID, Role } from './base';
+type Role = "Manager" | "Agent" | "People";
 
-type User = {
-    id: UniqueID;
-    username: string;
-    password: string;
-    role: Role;
-};
+interface User {
+  id?: number;
+  username: string;
+  password: string;
+  role: Role;
+}
+
+class UserEntity {
+  private userArray: User[];
+  private userId: number = 0;
+  constructor() {
+    this.userArray = [manager];
+  }
+
+  isUniqueUsername = (x: string): x is string => {
+    const repeatedItems = this.userArray.find((item) => item.username === x);
+    return repeatedItems === undefined;
+  };
+
+  add = (user: Omit<User, "id">): void => {
+    if (this.isUniqueUsername(user.username)) {
+      const newUser: User = {
+        id: ++this.userId,
+        username: user.username,
+        password: user.password,
+        role: user.role,
+      };
+      this.userArray = [...this.userArray, newUser];
+    }
+  };
+
+  login = (username: string, password: string): User | undefined => {
+    const foundUser = this.userArray.find(
+      (item) => item.username === username && item.password === password
+    );
+
+    return foundUser;
+  };
+}
 
 const manager: User = {
-    id: 1 as UniqueID,
-    username: 'manager',
-    password: 'manager1234',
-    role: 'Manager',
+  username: "manager",
+  password: "manager1234",
+  role: "Manager",
 };
 
-const agent: User = {
-    id: 2 as UniqueID,
-    username: 'ali',
-    password: 'ali1234',
-    role: 'Agent',
+const agent1: User = {
+  username: "ali",
+  password: "ali1234",
+  role: "Agent",
 };
 
-const person: User = {
-    id: 3 as UniqueID,
-    username: 'amir',
-    password: 'amir1234',
-    role: 'People',
+const agent2: User = {
+  username: "ali",
+  password: "ali1234",
+  role: "Agent",
 };
 
-let users: User[] = [];
-
-const isUniqueID = (x: number): x is UniqueID => {
-    const repeatedItems = users.filter((item) => item.id === x);
-    if (repeatedItems.length > 0) {
-      return false;
-    }
-    return typeof x === 'number' && x > 0;
+const user1: User = {
+  username: "amir",
+  password: "amir1234",
+  role: "People",
 };
 
-const isUniqueUsername = (x: string): x is string => {
-    const repeatedItems = users.filter((item) => item.username === x);
-    if (repeatedItems.length > 0) {
-      return false;
-    }
-    return typeof x === 'string';
+const user2: User = {
+  username: "ahmad",
+  password: "ahmad1234",
+  role: "People",
+};
+
+const user3: User = {
+  username: "zahra",
+  password: "zahra1234",
+  role: "People",
 };
 
 const isRole = (x: string): x is Role => {
-    return ['Manager', 'Agent', 'People'].includes(x);
+  return ["Manager", "Agent", "People"].includes(x);
 };
 
-const add = (item: User): UniqueID => {
-    if (isUniqueID(item.id)) {
-      if (isUniqueUsername(item.username)) {
-        if (isRole(item.role)) {
-            users.push(item);
-        }
-      }
-    }
-    return item.id;
+const users = new UserEntity();
+
+users.add(manager);
+users.add(agent1);
+users.add(agent2);
+users.add(user1);
+users.add(user2);
+users.add(user3);
+
+export const loginUser = (
+  username: string,
+  password: string
+): User | undefined => {
+  return users.login(username, password);
 };
-
-add(manager);
-add(agent);
-add(person);
-
-export const getUser = (username: string, password: string): User | undefined => {
-    return users.find((item) => item.username === username && item.password === password);
-};
-
-export type { User };

@@ -13,7 +13,7 @@
 //             id INTEGER PRIMARY KEY AUTOINCREMENT,
 //             title TEXT
 //           );`);
-          
+
 //   db.run(`CREATE TABLE IF NOT EXISTS programs (
 //             id INTEGER PRIMARY KEY AUTOINCREMENT,
 //             plan_id INTEGER,
