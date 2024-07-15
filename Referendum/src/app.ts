@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import { loginUser } from "./user";
 import { Project, addProject, getProjects } from "./project";
+import { Program, addProgram, getPrograms } from "./program";
+import { Vote, addVote, getVotes } from "./vote";
 
 const app = express();
 
@@ -81,13 +83,13 @@ app.post("/project/add", (req, res) => {
       .send(JSON.stringify({ message: "Username or password is incorrect!" }));
   }
 
-  const manager_id = user.id;
+  const user_id = user.id;
   const title = req.body.title?.toString();
   const program_deadline = req.body.program_deadline?.toString();
   const vote_deadline = req.body.vote_deadline?.toString();
 
   const newProject: Project = {
-    manager_id: manager_id,
+    user_id: user_id,
     title: title,
     program_deadline: program_deadline,
     vote_deadline: vote_deadline,
@@ -110,6 +112,90 @@ app.post("/project/add", (req, res) => {
   }
 });
 
-app.post("/program/add", (req, res) => {});
+app.post("/program/add", (req, res) => {
+  const username = req.query.username?.toString();
+  const password = req.query.password?.toString();
 
-app.post("/vote/add", (req, res) => {});
+  if (!username || !password) {
+    return res
+      .status(401)
+      .send(JSON.stringify({ message: "Username and password are required!" }));
+  }
+
+  const user = loginUser(username, password);
+
+  if (user === undefined) {
+    return res
+      .status(401)
+      .send(JSON.stringify({ message: "Username or password is incorrect!" }));
+  }
+
+  const user_id = user.id;
+  const title = req.body.title;
+  const project_id = req.body.project_id;
+
+  const newProgram: Program = {
+    title: title,
+    user_id: user_id,
+    project_id: project_id,
+  };
+
+  switch (user.role) {
+    case "Agent":
+      const messageAdd = addProgram(newProgram);
+      const resultAdd = {
+        message: messageAdd,
+        data: getPrograms(),
+      };
+      return res.send(JSON.stringify(resultAdd));
+    default:
+      return res.status(403).send(
+        JSON.stringify({
+          message: "You don't have permission to add program!",
+        })
+      );
+  }
+});
+
+app.post("/vote/add", (req, res) => {
+  const username = req.query.username?.toString();
+  const password = req.query.password?.toString();
+
+  if (!username || !password) {
+    return res
+      .status(401)
+      .send(JSON.stringify({ message: "Username and password are required!" }));
+  }
+
+  const user = loginUser(username, password);
+
+  if (user === undefined) {
+    return res
+      .status(401)
+      .send(JSON.stringify({ message: "Username or password is incorrect!" }));
+  }
+
+  const user_id = user.id;
+  const program_id = req.body.program_id;
+
+  const newVote: Vote = {
+    user_id: user_id,
+    program_id: program_id,
+  };
+
+  switch (user.role) {
+    case "People":
+      const messageAdd = addVote(newVote);
+      const resultAdd = {
+        message: messageAdd,
+        data: getPrograms(),
+      };
+      return res.send(JSON.stringify(resultAdd));
+    default:
+      return res.status(403).send(
+        JSON.stringify({
+          message: "You don't have permission to vote!",
+        })
+      );
+  }
+});

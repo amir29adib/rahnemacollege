@@ -16,7 +16,7 @@ class UserEntity {
     this.userArray = [];
   }
 
-  isUniqueUsername = (x: string): x is string => {
+  isUniqueUsername = (x: string): boolean => {
     const repeatedItems = this.userArray.find((item) => item.username === x);
     return repeatedItems === undefined;
   };
