@@ -4,18 +4,20 @@ interface Vote {
   plan_id: number;
 }
 
+type RequiredVote = Required<Vote>;
+
 class VoteEntity {
-  private voteArray: Vote[];
+  private voteArray: RequiredVote[];
   private voteId: number = 0;
   constructor() {
     this.voteArray = [];
   }
 
-  add = (vote: Omit<Vote, "id">): void => {
-    const newVote: Vote = {
-    id: ++this.voteId,
-    user_id: vote.user_id,
-    plan_id: vote.plan_id,
+  add = (vote: Vote): void => {
+    const newVote: RequiredVote = {
+      id: ++this.voteId,
+      user_id: vote.user_id,
+      plan_id: vote.plan_id,
     };
     this.voteArray = [...this.voteArray, newVote];
   };

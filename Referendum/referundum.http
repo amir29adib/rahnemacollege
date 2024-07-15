@@ -8,7 +8,19 @@ content-type: application/json
 
 ###
 
-GET https://example.com/topics/1 HTTP/1.1
+POST http://localhost:3000/project/add?username=ali&password=ali1234
+content-type: application/json
+
+{
+  "agent_id": 3,
+  "title": "project 3",
+  "program_deadline": "2024-09-02",
+  "vote_deadline": "2024-11-2"
+}
+
+###
+
+GET http://localhost:3000/topics/1 HTTP/1.1
 
 ###
 

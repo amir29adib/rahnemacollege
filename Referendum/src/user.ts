@@ -7,11 +7,13 @@ interface User {
   role: Role;
 }
 
+type RequiredUser = Required<User>;
+
 class UserEntity {
-  private userArray: User[];
+  private userArray: RequiredUser[];
   private userId: number = 0;
   constructor() {
-    this.userArray = [manager];
+    this.userArray = [];
   }
 
   isUniqueUsername = (x: string): x is string => {
@@ -19,9 +21,9 @@ class UserEntity {
     return repeatedItems === undefined;
   };
 
-  add = (user: Omit<User, "id">): void => {
+  add = (user: User): void => {
     if (this.isUniqueUsername(user.username)) {
-      const newUser: User = {
+      const newUser: RequiredUser = {
         id: ++this.userId,
         username: user.username,
         password: user.password,
@@ -31,7 +33,7 @@ class UserEntity {
     }
   };
 
-  login = (username: string, password: string): User | undefined => {
+  login = (username: string, password: string): RequiredUser | undefined => {
     const foundUser = this.userArray.find(
       (item) => item.username === username && item.password === password
     );
@@ -92,6 +94,6 @@ users.add(user3);
 export const loginUser = (
   username: string,
   password: string
-): User | undefined => {
+): RequiredUser | undefined => {
   return users.login(username, password);
 };

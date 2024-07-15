@@ -1,21 +1,23 @@
 interface Program {
   id?: number;
   agent_id: number;
-  plan_id: number;
+  project_id: number;
 }
 
+type RequiredProgram = Required<Program>;
+
 class ProgramEntity {
-  private programArray: Program[];
+  private programArray: RequiredProgram[];
   private programId: number = 0;
   constructor() {
     this.programArray = [];
   }
 
-  add = (program: Omit<Program, "id">): void => {
-    const newProgram: Program = {
-    id: ++this.programId,
-    agent_id: program.agent_id,
-    plan_id: program.plan_id,
+  add = (program: Program): void => {
+    const newProgram: RequiredProgram = {
+      id: ++this.programId,
+      agent_id: program.agent_id,
+      project_id: program.project_id,
     };
     this.programArray = [...this.programArray, newProgram];
   };
@@ -23,12 +25,12 @@ class ProgramEntity {
 
 const program1: Program = {
   agent_id: 3,
-  plan_id: 1,
+  project_id: 1,
 };
 
 const program2: Program = {
   agent_id: 2,
-  plan_id: 2,
+  project_id: 2,
 };
 
 const programs = new ProgramEntity();

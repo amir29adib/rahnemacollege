@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { loginUser } from "./user";
+import { Project, addProject, getProjects } from "./project";
 
 const app = express();
 
@@ -38,11 +39,23 @@ app.post("/user/login", (req, res) => {
 
   switch (user.role) {
     case "Manager":
-      return res.redirect(`/plans/${user.username}`);
+      return res.send(
+        JSON.stringify({
+          message: `Hello ${username}! You have access of Manager to add project in route '/project/add' with method post!`,
+        })
+      );
     case "Agent":
-      return res.redirect("/programs");
+      return res.send(
+        JSON.stringify({
+          message: `Hello ${username}! You have access of Agent to add program in route '/program/add' with method post!`,
+        })
+      );
     case "People":
-      return res.redirect("/votes");
+      return res.send(
+        JSON.stringify({
+          message: `Hello ${username}! You have access of People to vote in route '/vote/add' with method post!`,
+        })
+      );
     default:
       JSON.stringify({
         message: "No such role exists!",
@@ -50,23 +63,53 @@ app.post("/user/login", (req, res) => {
   }
 });
 
-app.get("/plans:username", (req, res) => {
-  const username = req.params.username.toString();
-  JSON.stringify({
-    message: `Hello ${username}! You have access of Manager to add plan in route '/plan/add' with method post!`,
-  });
+app.post("/project/add", (req, res) => {
+  const username = req.query.username?.toString();
+  const password = req.query.password?.toString();
+
+  if (!username || !password) {
+    return res
+      .status(401)
+      .send(JSON.stringify({ message: "Username and password are required!" }));
+  }
+
+  const user = loginUser(username, password);
+
+  if (user === undefined) {
+    return res
+      .status(401)
+      .send(JSON.stringify({ message: "Username or password is incorrect!" }));
+  }
+
+  const manager_id = user.id;
+  const title = req.body.title?.toString();
+  const program_deadline = req.body.program_deadline?.toString();
+  const vote_deadline = req.body.vote_deadline?.toString();
+
+  const newProject: Project = {
+    manager_id: manager_id,
+    title: title,
+    program_deadline: program_deadline,
+    vote_deadline: vote_deadline,
+  };
+
+  switch (user.role) {
+    case "Manager":
+      const messageAdd = addProject(newProject);
+      const resultAdd = {
+        message: messageAdd,
+        data: getProjects(),
+      };
+      return res.send(JSON.stringify(resultAdd));
+    default:
+      return res.status(403).send(
+        JSON.stringify({
+          message: "You don't have permission to add project!",
+        })
+      );
+  }
 });
 
-app.get("/programs:username", (req, res) => {
-  const username = req.params.username.toString();
-  JSON.stringify({
-    message: `Hello ${username}! You have access of Agent to add program in route '/program/add' with method post!`,
-  });
-});
+app.post("/program/add", (req, res) => {});
 
-app.get("/votes:username", (req, res) => {
-  const username = req.params.username.toString();
-  JSON.stringify({
-    message: `Hello ${username}! You have access of People to vote in route '/vote/add' with method post!`,
-  });
-});
+app.post("/vote/add", (req, res) => {});
