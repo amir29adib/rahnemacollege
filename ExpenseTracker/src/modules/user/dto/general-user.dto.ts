@@ -7,7 +7,3 @@ export const generalUserDto = z.object({
 });
 
 export type GeneralUserDto = z.infer<typeof generalUserDto>;
-
-export const isGeneralUserDto = (obj: object): obj is GeneralUserDto => {
-  return obj && typeof obj === "object" && "id" in obj && "username" in obj && "password" in obj;
-};

@@ -1,0 +1,43 @@
+import { createExpense } from "modules/expense/create-expense";
+import { HttpError } from "utilities/http-error";
+
+describe("Create Expense", () => {
+  it("should not create if cost is not positive", () => {
+    expect(() =>
+      createExpense({
+        group_id: "sdsdvdffvdvs4234fvsfv",
+        cost: 0,
+        spender: {
+          id: "abbfdert231dcsdc3sdc",
+          username: "ali",
+          password: "ali1234",
+        },
+      })
+    ).toThrow(HttpError);
+    expect(() =>
+      createExpense({
+        group_id: "sdsdvdffvdvs4234fvsfv",
+        cost: -10,
+        spender: {
+          id: "abbfdert231dcsdc3sdc",
+          username: "ali",
+          password: "ali1234",
+        },
+      })
+    ).toThrow(HttpError);
+  });
+
+  it("should not create if the spender does not exist!", () => {
+    expect(() =>
+      createExpense({
+        group_id: "sdsdvdffvdvs4234fvsfv",
+        cost: 10000,
+        spender: {
+          id: "abbfdert231dcsdc3sdc",
+          username: "ali",
+          password: "ali1234",
+        },
+      })
+    ).toThrow(HttpError);
+  });
+});

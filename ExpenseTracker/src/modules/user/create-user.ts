@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { v4 } from "uuid";
 import { User, users } from "models/user.model";
 import { HttpError } from "utilities/http-error";
 import { CreateUserDto } from "modules/user/dto/create-user.dto";
@@ -14,7 +14,7 @@ export const createUser = (dto: CreateUserDto): string => {
   }
 
   const user: User = {
-    id: uuidv4(),
+    id: v4(),
     username: dto.username,
     password: dto.password,
   };

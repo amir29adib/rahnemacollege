@@ -1,46 +1,45 @@
-import { v4 as uuidv4 } from "uuid";
-import { users } from "models/user.model";
+import { v4 } from "uuid";
 import { HttpError } from "utilities/http-error";
 import { CreateGroupDto } from "./dto/create-group.dto";
-import { isGeneralUserDto } from "modules/user/dto/general-user.dto";
 import { Group, groups } from "models/group.model";
+import { users } from "models/user.model";
 
 export const createGroup = (dto: CreateGroupDto): string => {
-  if (dto.cost <= 0) {
-    throw new HttpError(400, "Price must be positive number!");
-  }
+  
+  const sortedNewIds = [...dto.user_ids].sort();
+  const existNewUserId = groups.filter((item) => {
+    const sortedGroupIds = [...item.user_ids].sort();
+    return (
+      sortedGroupIds.length === sortedNewIds.length &&
+      sortedGroupIds.every((id, index) => id === sortedNewIds[index])
+    );
+  });
 
-  if (Object.keys(dto.spender).length === 0) {
-    throw new HttpError(400, "Spender can not be empty!");
-  }
+  // console.log(
+  //   groups.some((item) => {
+  //     return [...item.user_ids].sort();
+  //   })
+  // );
 
-  const checkEmptyOtherUsers = dto.otherUsers.find(
-    (item) => Object.keys(item).length === 0
+  console.log(sortedNewIds);
+
+  // console.log(existNewUserId);
+
+  const usersIds = users.map((item) => item.id);
+  const unknownUserId = dto.user_ids.find(
+    (user_id) => !usersIds.includes(user_id)
   );
 
-  if (checkEmptyOtherUsers !== undefined) {
-    throw new HttpError(400, "No items from this otherUsers can be empty!");
+  if (unknownUserId !== undefined) {
+    throw new HttpError(400, `User_id ${unknownUserId} is not found`);
   }
 
-  if (isGeneralUserDto(dto.spender)) {
-    const spenderObject = dto.spender;
-    const checkSpenderExist = users.find(
-      (item) => item.id === spenderObject.id
-    );
-    if (checkSpenderExist === undefined) {
-      throw new HttpError(400, "Spender does not exist!");
-    }
-  }
+  const group: Group = {
+    id: v4(),
+    user_ids: dto.user_ids,
+  };
 
-  const group = {
-    id: uuidv4(),
-  }
-//     cost: dto.cost,
-//     spender: dto.spender,
-//     otherUsers: dto.otherUsers,
-//   };
-
-//   groups.push(group);
+  groups.push(group);
 
   return group.id;
 };
